@@ -50,7 +50,7 @@
 ```
 
 ---
-### [Vision Assistant](https://rkuo2000.github.io/vision-assistant/) `camera` `gemini`
+### [vision-assistant.html](https://rkuo2000.github.io/vision-assistant/) `camera` `gemini`
 ```
 寫出一個使用webcam 有擷取，詢問，朗讀 等按鍵，可輸入Gemini API Key, 及輸入模型名稱（default="gemini-2.5-flash")
 ```
@@ -73,10 +73,10 @@
 ```
 
 ---
-### [CMOS 運算放大器模擬](https://rkuo2000.github.io/app-cmos_op/)
+### [cmos_op.html](https://rkuo2000.github.io/app-cmos_op/)
 
 ---
-### [galaxian](https://rkuo2000.github.io/app-galaxian)
+### [Galaxian](https://rkuo2000.github.io/app-galaxian)
 **Blog**: [Galaxian 遊戲指南與開發更新](https://vocus.cc/article/697f7388fd89780001b59a98)<br>
 **[Prompt](https://github.com/rkuo2000/VibeCoding/blob/main/galaxian.md)**<br>
 
