@@ -9,7 +9,7 @@
 ### App 服務器
 1. 在電腦上將AI產生的html (例如: ai_studio_code.html) 複製到 index.html
 2. 在電腦上執行`python main.py` (提供HTTPS Server)
-3. 在電腦上打開Chrome瀏覽器 `https://127.0.0.1:8000` 
+3. 在電腦上打開Chrome瀏覽器 `https://127.0.0.1:8000` <br>
 或在手機上打開Chrome瀏覽器`https://192.168.0.14:8000` (192.168.0.14 是PC連網的位址）
 
 ---
