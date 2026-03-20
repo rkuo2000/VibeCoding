@@ -13,7 +13,7 @@
 或在手機上打開Chrome瀏覽器`https://192.168.0.14:8000` (192.168.0.14 是PC連網的位址）
 
 ---
-### [asr.html](https://github.com/rkuo2000/VibeCoding/blob/main/asr.html) 即時語音轉文字
+### [asr.html](https://rkuo2000.github.io/app-asr) 即時語音轉文字
 
 ---
 ### [alphabet.html](https://rkuo2000.github.io/app-alphabet/)
