@@ -1,7 +1,6 @@
 # Vibe Coding
 **Paper**: [Vibe Coding vs Agentic Coding](https://arxiv.org/html/2505.19443v1)<br>
 ![](https://arxiv.org/html/2505.19443v1/x2.png)
-![](https://arxiv.org/html/2505.19443v1/x3.png)
 
 ---
 ## App 範例
@@ -90,7 +89,7 @@
 ### [cmos_op.html](https://rkuo2000.github.io/app-cmos_op/)
 
 ---
-### [Galaxian](https://rkuo2000.github.io/app-galaxian)
+### [galaxian](https://rkuo2000.github.io/app-galaxian)
 **Blog**: [Galaxian 遊戲指南與開發更新](https://vocus.cc/article/697f7388fd89780001b59a98)<br>
 **[Prompt](https://github.com/rkuo2000/VibeCoding/blob/main/galaxian.md)**<br>
 
