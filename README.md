@@ -12,26 +12,26 @@
 或在手機上打開Chrome瀏覽器`https://192.168.0.14:8000` (192.168.0.14 是PC連網的位址）
 
 ---
-### [alphabet.html](https://rkuo2000.github.io/app-alphabet/)
+### [alphabet.html](https://rkuo2025.github.io/app-alphabet/)
 ```
 寫出一個網頁給幼兒園學習26個英文字母，搭配單字，要能發出聲音與顯示圖片，要加上RWD
 ```
 
 ---
-### [jp_alphabet.html](https://rkuo2000.github.io/app-jp-alphabet/)
+### [jp_alphabet.html](https://rkuo2025.github.io/app-jp-alphabet/)
 ```
 寫出一個網頁給幼兒園學習日文字母，搭配單字，要能發出聲音與顯示圖片，要加上RWD
 ```
 
 ---
-### [alchemy.html](https://rkuo2000.github.io/app-alchemy/)
+### [alchemy.html](https://rkuo2025.github.io/app-alchemy/)
 ```
 寫一個html 以國中化學為內容，產生一個小小煉金術師實驗室，可選擇化學基本元素及顯示其圖片，選定元素後進行合成或重置，並以web3D產生動畫，
 顯示最後之合成物的分子結構，及此合成物的圖片, 加上RWD, 合成鍋畫成一個古代爐鼎，無法合成時提示可合成之元素組成
 ```
 
 ---
-### [realtime_asr.html](https://rkuo2000.github.io/app-realtime_asr/) `mic`
+### [realtime_asr.html](https://rkuo2025.github.io/app-realtime_asr/) `mic`
 ```
 寫一個html 做即時語音轉文字，按鍵有開始或停止辨識，清除文字，儲存文字，使用界面採Tailwind風格及響應式網頁設計
 ```
@@ -43,33 +43,33 @@
 ```
 
 ---
-### [heartbeat.html](https://rkuo2000.github.io/app-heartbeat/) `camera`
+### [heartbeat.html](https://rkuo2025.github.io/app-heartbeat/) `camera`
 ```
 寫出一個html 使用webcam偵測人臉，利用rPPG演算法，感測出心跳BPM及顯示心跳波形,
 加入band-pass filter, 加入RWD
 ```
 
 ---
-### [camera_detect.html](https://rkuo2000.github.io/app-camera_detect/) `camera`
+### [object_detect.html](https://rkuo2025.github.io/app-object_detect/) `camera`
 ```
 寫出一個html 使用webcam使用tensorflow.js做物件偵測
 ```
 
 ---
-### [image_poem.html](https://rkuo2000.github.io/app-image_poem/) `camera` `gemini`
+### [image_poem.html](https://rkuo2025.github.io/app-image_poem/) `camera` `gemini`
 ```
 寫一個html 影像作詩系統，輸入主題的方式可選上傳照片或由webcam拍攝，選定輸入按鍵後使用Gemini辨識（輸入Gemini API) 並作詩一首，
 最後產生照片與詩句結合的圖片，支援RWD
 ```
 
 ---
-### [vision-assistant.html](https://rkuo2000.github.io/vision-assistant/) `camera` `gemini`
+### [vision_assistant.html](https://rkuo2025.github.io/app-vision_assistant/) `camera` `gemini`
 ```
 寫出一個使用webcam 有擷取，詢問，朗讀 等按鍵，可輸入Gemini API Key, 及輸入模型名稱（default="gemini-2.5-flash")
 ```
 
 ---
-### [polePID_sim.html](https://rkuo2000.github.io/app-polePID_sim/)
+### [polePID_sim.html](https://rkuo2025.github.io/app-polePID_sim/)
 ```
 我是一個電機系學生，請幫我寫一個單軸橫桿平衡的PID模擬網頁工具。
 1. 物理模型：模擬一個中間有支點的長桿，兩端有馬達推力。系統輸入為PID參數。
@@ -86,10 +86,9 @@
 ```
 
 ---
-### [cmos_op.html](https://rkuo2000.github.io/app-cmos_op/)
+### [cmos_op.html](https://rkuo2025.github.io/app-cmos_op/)
 
 ---
-### [galaxian](https://rkuo2000.github.io/app-galaxian)
+### [galaxian](https://rkuo2025.github.io/app-galaxian)
 **Blog**: [Galaxian 遊戲指南與開發更新](https://vocus.cc/article/697f7388fd89780001b59a98)<br>
 **[Prompt](https://github.com/rkuo2000/VibeCoding/blob/main/galaxian.md)**<br>
-
