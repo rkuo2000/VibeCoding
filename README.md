@@ -66,6 +66,7 @@
 ### [vision_assistant.html](https://rkuo2025.github.io/app-vision_assistant/) `camera` `gemini`
 ```
 寫出一個html使用webcam 有擷取，詢問，朗讀 等按鍵，可輸入Gemini API Key, 及輸入模型名稱（default="gemini-2.5-flash")
+支援Tailwind風格及響應式網頁設計
 ```
 
 ---
