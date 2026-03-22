@@ -69,6 +69,12 @@
 ```
 
 ---
+### [voice_assistant.html](https://rkuo2025.github.io/app-voice_assistant/) `mic` `gemini`
+```
+write a html that use Voice to ask Gemini, and a button link to https://aistudio.google.com/api-keys, and a box for pasting Gemini API Key, a button to select en-US or zh-TW for recognition language
+```
+
+---
 ### [polePID_sim.html](https://rkuo2025.github.io/app-polePID_sim/)
 ```
 我是一個電機系學生，請幫我寫一個單軸橫桿平衡的PID模擬網頁工具。
