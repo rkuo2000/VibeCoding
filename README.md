@@ -71,7 +71,7 @@
 ---
 ### [voice_assistant.html](https://rkuo2025.github.io/app-voice_assistant/) `mic` `gemini`
 ```
-write a html that use Voice to ask Gemini, and a button link to https://aistudio.google.com/api-keys, and a box for pasting Gemini API Key, a button to select en-US or zh-TW for recognition language
+寫一個html Gemini 語音助理, 加一個按鍵連可取得 Gemini API Key, 及輸入 Gemini API Key, 一個可選辨識語言的按鍵
 ```
 
 ---
