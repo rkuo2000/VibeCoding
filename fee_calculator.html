@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>社區管理費（六個月/期）試算系統</title>
+    <style>
+        :root {
+            --primary-color: #3f51b5;
+            --primary-light: #e8eaf6;
+            --accent-color: #ff5722;
+            --text-dark: #333333;
+            --text-light: #666666;
+            --bg-color: #f5f7fa;
+            --card-bg: #ffffff;
+            --border-color: #dddddd;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif, "Microsoft JhengHei";
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-dark);
+            line-height: 1.6;
+            padding: 20px 10px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        header h1 {
+            color: var(--primary-color);
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+        }
+
+        header p {
+            color: var(--text-light);
+            font-size: 0.95rem;
+        }
+
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            padding: 20px;
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+
+        .card h2 {
+            font-size: 1.2rem;
+            color: var(--primary-color);
+            margin-bottom: 15px;
+            border-left: 4px solid var(--primary-color);
+            padding-left: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.9rem;
+            font-weight: bold;
+            color: var(--text-dark);
+            margin-bottom: 5px;
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 0.95rem;
+            transition: border-color 0.2s;
+        }
+
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        /* 結果展示區域 */
+        .result-card {
+            background: linear-gradient(135deg, var(--primary-color) 0%, #283593 100%);
+            color: white;
+            border-radius: 8px;
+            padding: 25px;
+            box-shadow: 0 4px 15px rgba(63, 81, 181, 0.3);
+        }
+
+        .result-card h2 {
+            color: white;
+            border-left-color: white;
+            margin-bottom: 20px;
+        }
+
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255,255,255,0.2);
+            padding: 12px 0;
+        }
+
+        .result-item:last-child {
+            border-bottom: none;
+        }
+
+        .result-label {
+            font-size: 0.95rem;
+            opacity: 0.9;
+        }
+
+        .result-value {
+            font-size: 1.1rem;
+            font-weight: bold;
+        }
+
+        .total-amount-container {
+            margin-top: 15px;
+            background-color: rgba(255,255,255,0.1);
+            padding: 15px;
+            border-radius: 6px;
+            text-align: center;
+        }
+
+        .total-amount-label {
+            font-size: 1.1rem;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .total-amount-value {
+            font-size: 2rem;
+            font-weight: 800;
+            color: #ffd54f;
+        }
+
+        /* 輔助說明的表格 */
+        .info-table-container {
+            margin-top: 20px;
+            overflow-x: auto;
+        }
+
+        .info-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.8rem;
+            text-align: left;
+            margin-top: 10px;
+        }
+
+        .info-table th, .info-table td {
+            border: 1px solid var(--border-color);
+            padding: 6px 8px;
+        }
+
+        .info-table th {
+            background-color: var(--primary-light);
+            color: var(--primary-color);
+        }
+
+        /* 響應式調整 */
+        @media (max-width: 600px) {
+            body {
+                padding: 10px;
+            }
+            header h1 {
+                font-size: 1.5rem;
+            }
+            .card {
+                padding: 15px;
+            }
+            .total-amount-value {
+                font-size: 1.6rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>社區管理費試算系統</h1>
+        <p>每一期以六個月合計（自動即時計算）</p>
+    </header>
+
+    <div class="grid-container">
+        <!-- 1) 住戶基本資料 -->
+        <div class="card">
+            <h2>1) 住戶基本資料</h2>
+            <div class="form-group">
+                <label for="house_area">戶坪數 (坪)</label>
+                <input type="number" id="house_area" value="60" step="0.01" min="0">
+            </div>
+            <div class="form-group">
+                <label for="parking_area">停車位坪數 (坪)</label>
+                <input type="number" id="parking_area" value="15" step="0.01" min="0">
+            </div>
+            <div class="form-group">
+                <label for="internet_fee">網路使用費 (每月/元)</label>
+                <input type="number" id="internet_fee" value="0" step="1" min="0">
+            </div>
+            <div class="form-group">
+                <label for="motorcycle_fee">機車格清潔費 (每月/元)</label>
+                <input type="number" id="motorcycle_fee" value="0" step="1" min="0">
+            </div>
+        </div>
+
+        <!-- 2) 社區基本資料 -->
+        <div class="card">
+            <h2>2) 社區基本資料</h2>
+            <div class="form-group">
+                <label for="ping_rate">每坪收費 (元)</label>
+                <input type="number" id="ping_rate" value="35" step="0.1" min="0">
+            </div>
+            <div class="form-group">
+                <label for="total_households">總戶數 (戶)</label>
+                <input type="number" id="total_households" value="320" min="1">
+            </div>
+            <div class="form-group">
+                <label for="monthly_security_fee">每月物業保全費用 (元)</label>
+                <input type="number" id="monthly_security_fee" value="215000" min="0">
+            </div>
+            <div class="form-group">
+                <label for="monthly_cleaning_fee">每月清潔費用 (元)</label>
+                <input type="number" id="monthly_cleaning_fee" value="84000" min="0">
+            </div>
+        </div>
+
+        <!-- 4) & 5) 每期公設電費與電梯分攤 -->
+        <div class="card">
+            <h2>3) 公電與電梯分攤設定</h2>
+            <div class="form-group">
+                <label for="large_electricity">大公電費 (元)</label>
+                <input type="number" id="large_electricity" value="7.01" step="0.01" min="0">
+            </div>
+            <div class="form-group">
+                <label for="small_electricity">小公電費 (元)</label>
+                <input type="number" id="small_electricity" value="2.91" step="0.01" min="0">
+            </div>
+            <div class="form-group">
+                <label for="building_select">選擇棟別 (可自動填入電梯分攤費)</label>
+                <select id="building_select">
+                    <option value="251.38">A1 (39戶 - $251.38)</option>
+                    <option value="377.07">A2 (26戶 - $377.07)</option>
+                    <option value="251.38">B1 (39戶 - $251.38)</option>
+                    <option value="245.10">B2 (40戶 - $245.10)</option>
+                    <option value="288.35">C1 (34戶 - $288.35)</option>
+                    <option value="228.00" selected>C2 (43戶 - $228.00)</option>
+                    <option value="350.14">D1 (28戶 - $350.14)</option>
+                    <option value="350.14">D2 (28戶 - $350.14)</option>
+                    <option value="350.14">E (28戶 - $350.14)</option>
+                    <option value="100.00">店面 (15戶 - $100.00)</option>
+                    <option value="custom">自訂金額</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="elevator_monthly">每棟電梯分攤月費 (可手動輸入/修改)</label>
+                <input type="number" id="elevator_monthly" value="228.00" step="0.01" min="0">
+            </div>
+        </div>
+    </div>
+
+    <!-- 計算結果展示 -->
+    <div class="card result-card">
+        <h2>試算結果（每期共六個月）</h2>
+        <div class="result-item">
+            <span class="result-label">汽車位清潔費 (每月)</span>
+            <span class="result-value" id="res_car_cleaning_monthly">$0</span>
+        </div>
+        <div class="result-item">
+            <span class="result-label">汽車位清潔費 (每期 6個月)</span>
+            <span class="result-value" id="res_car_cleaning_six">$0</span>
+        </div>
+        <div class="result-item">
+            <span class="result-label">每棟電梯分攤費用 (每月)</span>
+            <span class="result-value" id="res_elevator_monthly">$0</span>
+        </div>
+        <div class="result-item">
+            <span class="result-label">每棟電梯分攤費用 (每期 6個月)</span>
+            <span class="result-value" id="res_elevator_six">$0</span>
+        </div>
+        <div class="result-item">
+            <span class="result-label">每期管理費 (含基本、車位、網路、機車)</span>
+            <span class="result-value" id="res_period_mgmt">$0</span>
+        </div>
+        
+        <div class="total-amount-container">
+            <div class="total-amount-label">每期應繳總金額 (含電梯分攤費*6)</div>
+            <div class="total-amount-value" id="res_total_amount">$0</div>
+        </div>
+    </div>
+
+    <!-- 參考資料對照表 -->
+    <div class="card" style="margin-top: 20px;">
+        <h2 style="font-size: 1rem; margin-bottom: 5px;">附錄：每棟電梯分攤月費對照表</h2>
+        <div class="info-table-container">
+            <table class="info-table">
+                <thead>
+                    <tr>
+                        <th>棟別</th>
+                        <th>各棟戶數</th>
+                        <th>每戶每月攤提</th>
+                        <th>棟別</th>
+                        <th>各棟戶數</th>
+                        <th>每戶每月攤提</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>A1</td><td>39</td><td>251.38</td>
+                        <td>C2</td><td>43</td><td>228.00</td>
+                    </tr>
+                    <tr>
+                        <td>A2</td><td>26</td><td>377.07</td>
+                        <td>D1</td><td>28</td><td>350.14</td>
+                    </tr>
+                    <tr>
+                        <td>B1</td><td>39</td><td>251.38</td>
+                        <td>D2</td><td>28</td><td>350.14</td>
+                    </tr>
+                    <tr>
+                        <td>B2</td><td>40</td><td>245.10</td>
+                        <td>E</td><td>28</td><td>350.14</td>
+                    </tr>
+                    <tr>
+                        <td>C1</td><td>34</td><td>288.35</td>
+                        <td>店面</td><td>15</td><td>100.00</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+    // 獲取 DOM 元素
+    const houseAreaInput = document.getElementById('house_area');
+    const parkingAreaInput = document.getElementById('parking_area');
+    const internetFeeInput = document.getElementById('internet_fee');
+    const motorcycleFeeInput = document.getElementById('motorcycle_fee');
+    
+    const pingRateInput = document.getElementById('ping_rate');
+    const largeElectricityInput = document.getElementById('large_electricity');
+    const smallElectricityInput = document.getElementById('small_electricity');
+    
+    const buildingSelect = document.getElementById('building_select');
+    const elevatorMonthlyInput = document.getElementById('elevator_monthly');
+
+    // 結果顯示元素
+    const resCarCleaningMonthly = document.getElementById('res_car_cleaning_monthly');
+    const resCarCleaningSix = document.getElementById('res_car_cleaning_six');
+    const resElevatorMonthly = document.getElementById('res_elevator_monthly');
+    const resElevatorSix = document.getElementById('res_elevator_six');
+    const resPeriodMgmt = document.getElementById('res_period_mgmt');
+    const resTotalAmount = document.getElementById('res_total_amount');
+
+    // 切換棟別時，自動更新電梯分攤費輸入欄位
+    buildingSelect.addEventListener('change', function() {
+        if (this.value !== 'custom') {
+            elevatorMonthlyInput.value = this.value;
+            elevatorMonthlyInput.disabled = true; // 防呆，選擇預設時不可直接改 (或改為不鎖定，依使用者喜好)
+        } else {
+            elevatorMonthlyInput.disabled = false;
+        }
+        calculateFees();
+    });
+
+    // 設定初始狀態（預設選擇 C2 且鎖定輸入框，若需修改可選自訂金額）
+    elevatorMonthlyInput.disabled = true;
+
+    // 為所有輸入欄位綁定事件，實現即時計算
+    const allInputs = [
+        houseAreaInput, parkingAreaInput, internetFeeInput, motorcycleFeeInput,
+        pingRateInput, largeElectricityInput, smallElectricityInput, elevatorMonthlyInput
+    ];
+
+    allInputs.forEach(input => {
+        input.addEventListener('input', calculateFees);
+    });
+
+    // 格式化千分位
+    function formatCurrency(val) {
+        return '$' + parseFloat(val).toLocaleString('zh-TW', {
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 2
+        });
+    }
+
+    // 計算核心逻辑
+    function calculateFees() {
+        // 取值並做基本的防呆轉換
+        const houseArea = parseFloat(houseAreaInput.value) || 0;
+        const parkingArea = parseFloat(parkingAreaInput.value) || 0;
+        const internetFee = parseFloat(internetFeeInput.value) || 0;
+        const motorcycleFee = parseFloat(motorcycleFeeInput.value) || 0;
+        
+        const pingRate = parseFloat(pingRateInput.value) || 0;
+        const largeElectricity = parseFloat(largeElectricityInput.value) || 0;
+        const smallElectricity = parseFloat(smallElectricityInput.value) || 0;
+        const elevatorMonthly = parseFloat(elevatorMonthlyInput.value) || 0;
+
+        // 3) 汽車位清潔費（每月）= 車位坪數 x 每坪收費
+        const carCleaningMonthly = parkingArea * pingRate;
+        const carCleaningSix = carCleaningMonthly * 6;
+
+        // 4) 每期管理費 = (大公電費+小公電費+每坪收費) x 戶坪數 x 6 + 汽車位清潔費 x 6 + 網路費用 x 6 + 機車格清潔費 x 6
+        const periodMgmt = (largeElectricity + smallElectricity + pingRate) * houseArea * 6 
+                           + (carCleaningMonthly * 6) 
+                           + (internetFee * 6) 
+                           + (motorcycleFee * 6);
+
+        // 5) 電梯分攤費用
+        const elevatorSix = elevatorMonthly * 6;
+
+        // 6) 每期收費總金額 = 每期管理費 + 電梯分攤月費 x 6
+        const totalAmount = periodMgmt + elevatorSix;
+
+        // 更新畫面顯示
+        resCarCleaningMonthly.textContent = formatCurrency(carCleaningMonthly);
+        resCarCleaningSix.textContent = formatCurrency(carCleaningSix);
+        resElevatorMonthly.textContent = formatCurrency(elevatorMonthly);
+        resElevatorSix.textContent = formatCurrency(elevatorSix);
+        resPeriodMgmt.textContent = formatCurrency(periodMgmt);
+        resTotalAmount.textContent = formatCurrency(totalAmount);
+    }
+
+    // 初始化首次計算
+    calculateFees();
+</script>
+
+</body>
+</html>
