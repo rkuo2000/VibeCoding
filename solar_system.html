@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <title>Sci-Fi Solar System</title>
+    <style>
+        body { margin: 0; background: #050a10; overflow: hidden; color: #00f2ff; font-family: 'Courier New', Courier, monospace; }
+        canvas { display: block; }
+        #ui {
+            position: absolute; top: 20px; left: 20px; pointer-events: none;
+            text-transform: uppercase; letter-spacing: 2px; text-shadow: 0 0 10px #00f2ff;
+        }
+        .tooltip {
+            position: absolute; padding: 10px; background: rgba(0, 20, 40, 0.8);
+            border: 1px solid #00f2ff; border-radius: 4px; pointer-events: none;
+            display: none; font-size: 12px; box-shadow: 0 0 15px rgba(0, 242, 255, 0.3);
+        }
+    </style>
+</head>
+<body>
+    <div id="ui"><h1>System: Solar Orbit v1.0</h1></div>
+    <div id="tooltip" class="tooltip"></div>
+    <canvas id="solar"></canvas>
+
+    <script>
+        const canvas = document.getElementById('solar');
+        const ctx = canvas.getContext('2d');
+        const tooltip = document.getElementById('tooltip');
+
+        let width, height, cx, cy;
+        const planets = [
+            { name: "水星", color: "#A5A5A5", dist: 60, size: 3, speed: 0.047, period: "88天" },
+            { name: "金星", color: "#E3BB76", dist: 90, size: 5, speed: 0.035, period: "225天" },
+            { name: "地球", color: "#2271B3", dist: 130, size: 5.5, speed: 0.029, period: "365天" },
+            { name: "火星", color: "#E27B58", dist: 170, size: 4, speed: 0.024, period: "687天" },
+            { name: "木星", color: "#D39C7E", dist: 240, size: 12, speed: 0.013, period: "11.8年" },
+            { name: "土星", color: "#C5AB6E", dist: 310, size: 10, speed: 0.009, period: "29.4年" },
+            { name: "天王星", color: "#BBE1E6", dist: 370, size: 7, speed: 0.006, period: "84年" },
+            { name: "海王星", color: "#6081FF", dist: 420, size: 7, speed: 0.005, period: "165年" },
+        ];
+
+        let stars = [];
+        let angles = planets.map(() => Math.random() * Math.PI * 2);
+        let mouse = { x: 0, y: 0 };
+
+        function init() {
+            width = window.innerWidth;
+            height = window.innerHeight;
+            canvas.width = width;
+            canvas.height = height;
+            cx = width / 2;
+            cy = height / 2;
+            stars = Array.from({ length: 400 }, () => ({
+                x: Math.random() * width, y: Math.random() * height,
+                s: Math.random() * 2, o: Math.random()
+            }));
+        }
+
+        function draw() {
+            ctx.fillStyle = '#050a10';
+            ctx.fillRect(0, 0, width, height);
+
+            // 星空背景
+            stars.forEach(s => {
+                ctx.fillStyle = `rgba(255, 255, 255, ${0.3 + Math.sin(Date.now()*0.001 + s.o*10)*0.3})`;
+                ctx.beginPath(); ctx.arc(s.x, s.y, s.s, 0, Math.PI*2); ctx.fill();
+            });
+
+            // 太陽
+            ctx.shadowBlur = 30; ctx.shadowColor = '#ffcc00';
+            ctx.fillStyle = '#ffcc00';
+            ctx.beginPath(); ctx.arc(cx, cy, 20, 0, Math.PI*2); ctx.fill();
+            ctx.shadowBlur = 0;
+
+            let hoveredPlanet = null;
+
+            planets.forEach((p, i) => {
+                // 更新角度
+                angles[i] += p.speed * 0.5;
+                const px = cx + Math.cos(angles[i]) * p.dist;
+                const py = cy + Math.sin(angles[i]) * p.dist;
+
+                // 軌道線
+                ctx.strokeStyle = 'rgba(0, 242, 255, 0.15)';
+                ctx.beginPath(); ctx.arc(cx, cy, p.dist, 0, Math.PI*2); ctx.stroke();
+
+                // 行星
+                ctx.shadowBlur = 10; ctx.shadowColor = p.color;
+                ctx.fillStyle = p.color;
+                ctx.beginPath(); ctx.arc(px, py, p.size, 0, Math.PI*2); ctx.fill();
+                ctx.shadowBlur = 0;
+
+                // 檢測懸停
+                const dx = mouse.x - px, dy = mouse.y - py;
+                if (Math.sqrt(dx*dx + dy*dy) < p.size + 5) hoveredPlanet = p;
+            });
+
+            if (hoveredPlanet) {
+                tooltip.style.display = 'block';
+                tooltip.style.left = (mouse.x + 15) + 'px';
+                tooltip.style.top = (mouse.y + 15) + 'px';
+                tooltip.innerHTML = `<strong style="color:#00f2ff">${hoveredPlanet.name}</strong><br>週期: ${hoveredPlanet.period}`;
+            } else {
+                tooltip.style.display = 'none';
+            }
+
+            requestAnimationFrame(draw);
+        }
+
+        window.addEventListener('resize', init);
+        window.addEventListener('mousemove', e => { mouse.x = e.clientX; mouse.y = e.clientY; });
+        init();
+        draw();
+    </script>
+</body>
+</html>
