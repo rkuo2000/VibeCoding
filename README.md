@@ -41,6 +41,12 @@
 ```
 
 ---
+### [solar_system.html](https://rkuo2025.github.io/app-solar_system/)
+```
+用HTML+Canvas寫一個太陽系軌道動畫，八大行星按真實比例公轉，每個星球懸停時顯示名稱和軌道週期，背景是星空，風格科幻炫酷。
+```
+
+---
 ### [realtime_asr.html](https://rkuo2025.github.io/app-realtime_asr/) `mic`
 ```
 寫一個html 做即時語音轉文字，按鍵有開始或停止辨識，清除文字，儲存文字，使用界面採Tailwind風格及響應式網頁設計
