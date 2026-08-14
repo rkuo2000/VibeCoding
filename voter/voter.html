@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>區權會議案表決票產生器</title>
+    <!-- 引入 SheetJS 解析 Excel 檔案 (.xlsx, .xlsm) -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <style>
+        :root {
+            --print-color: #000;
+        }
+        body {
+            font-family: "Microsoft JhengHei", sans-serif;
+            padding: 20px;
+            background-color: #f0f2f5;
+        }
+        .setup-panel {
+            max-width: 800px;
+            margin: 0 auto 30px auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .input-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+        .input-group {
+            flex: 1;
+            min-width: 200px;
+        }
+        input, textarea, select {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        .proposal-edit {
+            border: 1px solid #eee;
+            padding: 10px;
+            margin-bottom: 10px;
+            background: #fafafa;
+        }
+        .field-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 8px;
+        }
+        .field-row label {
+            flex: 0 0 60px;
+            font-weight: bold;
+            font-size: 16px;
+        }
+        .field-row input[type="text"],
+        .field-row textarea {
+            flex: 1;
+            width: auto;
+            margin-top: 0;
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        button:hover { background: #0056b3; }
+
+        /* 選票樣式 */
+        #ballot-paper {
+            display: none;
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 40px;
+            border: 2px solid #000;
+            position: relative;
+        }
+        .ballot-title {
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+            text-decoration: underline;
+            margin-bottom: 20px;
+        }
+        .house-info {
+            font-size: 18px;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #000;
+            padding-bottom: 5px;
+            display: flex;
+            justify-content: space-between;
+        }
+        .proposal-item {
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 1px dashed #000;
+        }
+        .proposal-name {
+            font-size: 18px;
+            font-weight: bold;
+        }
+        .proposal-content {
+            margin: 10px 0;
+            line-height: 1.6;
+        }
+        .vote-options {
+            display: flex;
+            gap: 50px;
+            margin-top: 15px;
+        }
+        .option-box {
+            border: 2px solid #000;
+            width: 100px;
+            height: 45px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+        .stamp-hint {
+            font-size: 16px;
+            align-self: center;
+        }
+        .ballot-footer {
+            margin-top: 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+        .verify-info {
+            font-size: 14px;
+            font-family: monospace;
+        }
+        .qr-code img {
+            width: 120px;
+            height: 120px;
+        }
+
+        /* 列印設定 */
+        @media print {
+            .setup-panel, button { display: none !important; }
+            body { background: white; padding: 0; }
+            #ballot-paper { display: block !important; border: 2px solid #000; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="setup-panel">
+    <h2 style="text-align: center;">區權會議案表決票產生器</h2>
+    
+    <!-- 匯入 Excel 區塊 -->
+    <div class="input-row" style="background: #e9ecef; padding: 10px; border-radius: 5px;">
+        <div class="input-group">
+            <label><strong>載入住戶持分比數據 (household_ratio.xlsm)：</strong></label>
+            <input type="file" id="excel_file" accept=".xlsx, .xlsm, .xls" onchange="handleFileSelect(event)">
+        </div>
+    </div>
+
+    <div class="input-row">
+        <div class="input-group">
+            <label>1. 選擇/輸入戶號：</label>
+            <input type="text" id="in_house" list="house_list" value="A1-2" placeholder="例如：A1-1" onchange="onHouseChange()">
+            <datalist id="house_list"></datalist>
+        </div>
+        <div class="input-group">
+            <label>2. 持分比例（讀取數據帶入）：</label>
+            <input type="text" id="in_share" placeholder="例如： 0.543">
+        </div>
+    </div>
+
+    <div id="edit-area">
+        <!-- 議案1 -->
+        <div class="proposal-edit">
+            <strong>議案 一</strong>
+            <div class="field-row">
+                <label>案由</label>
+                <input type="text" id="in_p1_t" value="導入台電代收與大公按戶分攤之永續社區案">
+            </div>
+            <div class="field-row">
+                <label>表決</label>
+                <textarea id="in_p1_c" rows="2">是否同意授權管委會申請台電代收大公電費？</textarea>
+            </div>
+        </div>
+        <!-- 議案2 -->
+        <div class="proposal-edit">
+            <strong>議案 二</strong>
+            <div class="field-row">
+                <label>案由</label>
+                <input type="text" id="in_p2_t" value="社區各項固定支出調漲限制案">
+            </div>
+            <div class="field-row">
+                <label>表決</label>
+                <textarea id="in_p2_c" rows="2">是否同意社區各項固定支出之合約簽訂，續約金額較前一期合約增加百分之十(含)以上者，應提經區分所有權人會議決議通過後始得簽約？</textarea>
+            </div>
+        </div>
+        <!-- 議案3 -->
+        <div class="proposal-edit">
+            <strong>議案 三</strong>
+            <div class="field-row">
+                <label>案由</label>
+                <input type="text" id="in_p3_t" value="重大修繕或改良之工程金額調整方案">
+            </div>
+            <div class="field-row">
+                <label>表決</label>
+                <textarea id="in_p3_c" rows="2">是否同意調整重大修繕或改良之工程金額？</textarea>
+            </div>
+        </div>
+    </div>
+
+    <button onclick="generateBallot()">產生並預覽選票</button>
+</div>
+
+<!-- 選票本體 -->
+<div id="ballot-paper">
+    <div class="ballot-header">
+        <div class="ballot-title"> 椰城區分所有權人會議 議案表決票</div>
+        <div class="house-info">
+            <span>持分比例：<span id="out_share"></span></span>
+        </div>
+    </div>
+
+    <div id="out_proposals">
+        <!-- JS 動態填入 -->
+    </div>
+
+    <div class="ballot-footer">
+        <div class="verify-info">
+            <strong>選票驗證碼：</strong><br>			
+        </div>
+        <div class="qr-code" id="out_qrcode">
+            <!-- QR Code 圖片 -->
+        </div>
+    </div>
+</div>
+
+<script>
+    // 儲存 Excel 解析後的戶號與權重資料對照表
+    let houseDataMap = {};
+
+    // 格式化數字至小數點後三位
+    function formatToThreeDecimals(val) {
+        if (val === null || val === undefined || val === "") return "";
+        let num = parseFloat(val);
+        if (!isNaN(num)) {
+            return num.toFixed(3);
+        }
+        return val;
+    }
+
+    // SHA256 計算（使用 Web Crypto）
+    async function sha256(str) {
+        const data = new TextEncoder().encode(str);
+        const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+        const hashArray = Array.from(new Uint8Array(hashBuffer));
+        return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    }
+
+    // 產生隨機鹽值（十六進制）
+    function randomSalt(bytes = 8) {
+        const arr = new Uint8Array(bytes);
+        crypto.getRandomValues(arr);
+        return Array.from(arr).map(b => b.toString(16).padStart(2, '0')).join('');
+    }
+
+    // 讀取上傳的 Excel (用戶坪數.xlsm)
+    function handleFileSelect(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const data = new Uint8Array(e.target.result);
+            const workbook = XLSX.read(data, { type: 'array' });
+            
+            // 讀取第一個工作表
+            const firstSheetName = workbook.SheetNames[0];
+            const worksheet = workbook.Sheets[firstSheetName];
+            
+            // 轉成 JSON 陣列
+            const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+            
+            parseExcelData(jsonData);
+        };
+        reader.readAsArrayBuffer(file);
+    }
+
+    // 解析 Excel 欄位資訊
+    function parseExcelData(data) {
+        if (data.length < 2) return;
+
+        // 假設第一列為標題，自動尋找「戶號」與「坪數/持分/權比例」等標題欄位
+        const header = data[0];
+        let houseIdx = -1;
+        let shareIdx = -1;
+
+        header.forEach((colName, index) => {
+            if (colName) {
+                const str = colName.toString().trim();
+                if (str.includes("戶號") || str.includes("棟別") || str.includes("門牌")) houseIdx = index;
+                if (str.includes("坪數") || str.includes("持分") || str.includes("比例") || str.includes("權數")) shareIdx = index;
+            }
+        });
+
+        // 預設Fallback：若找不到標題，第一欄當戶號，第二欄當坪數/持分
+        if (houseIdx === -1) houseIdx = 0;
+        if (shareIdx === -1) shareIdx = 1;
+
+        const datalist = document.getElementById('house_list');
+        datalist.innerHTML = "";
+        houseDataMap = {};
+
+        for (let i = 1; i < data.length; i++) {
+            const row = data[i];
+            if (row[houseIdx] !== undefined) {
+                const houseName = row[houseIdx].toString().trim();
+                let shareVal = row[shareIdx] !== undefined ? row[shareIdx].toString().trim() : "";
+                
+                // 將格式化為小數點後三位的數值存入 map
+                houseDataMap[houseName] = formatToThreeDecimals(shareVal);
+
+                // 加入選單datalist供下拉選取
+                const option = document.createElement('option');
+                option.value = houseName;
+                datalist.appendChild(option);
+            }
+        }
+        alert(`成功載入 ${Object.keys(houseDataMap).length} 筆戶號權重數據！`);
+        onHouseChange();
+    }
+
+    // 當輸入或選擇戶號時自動連動帶出持分比例
+    function onHouseChange() {
+        const currentHouse = document.getElementById('in_house').value.trim();
+        if (houseDataMap[currentHouse] !== undefined) {
+            document.getElementById('in_share').value = houseDataMap[currentHouse];
+        }
+    }
+
+    async function generateBallot() {
+        // 1. 獲取輸入值
+        const house = document.getElementById('in_house').value || "未填";
+        let share = document.getElementById('in_share').value || "未設定";
+        
+        // 確保呈現給使用者預覽/列印的持分比也是三位小數
+        share = formatToThreeDecimals(share);
+
+        // 2. 生成時間碼 (YYYYMMDDHHmm)
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+        const day = String(now.getDate()).padStart(2, '0');
+        const hour = String(now.getHours()).padStart(2, '0');
+        const min = String(now.getMinutes()).padStart(2, '0');
+        const timePart = `${year}${month}${day}${hour}${min}`;
+
+        // 3. 生成隨機鹽值
+        const salt = randomSalt(16); // 32 hex chars
+
+        // QR 內容格式：salt.timePart.house （伺服器端簽章，不在前端暴露密碼）
+        const qrPayload = `${salt}.${timePart}.${house}`;
+        const fullVerifyCode = qrPayload;
+
+        // 4. 更新選票文字 (僅保留持分比)
+        document.getElementById('out_share').innerText = share;
+        
+        // 5. 處理三個議案
+        let proposalHtml = "";
+        for (let i = 1; i <= 3; i++) {
+            const title = document.getElementById(`in_p${i}_t`).value;
+            const content = document.getElementById(`in_p${i}_c`).value;
+            
+            proposalHtml += `
+                <div class="proposal-item">
+                    <div class="proposal-name">${i}. ${title}</div>
+                    <div class="proposal-content">${content}</div>
+                    <div class="vote-options">
+                        <div class="option-box">同意</div>
+                        <div class="option-box">不同意</div>
+                        <div class="stamp-hint">(請圈選同意或不同意)</div>
+                    </div>
+            `;
+
+            // 如果是議案三，增加提示與圈選選項
+            if (i === 3) {
+                proposalHtml += `
+                    <div class="stamp-hint" style="margin-top: 15px;">(同意者請圈選以下一個金額)</div>					
+                    <div class="vote-options">				
+                        <div class="option-box">12萬元</div> 
+                    </div>
+                    <div class="vote-options">
+                        <div class="option-box">15萬元</div>
+                    </div>
+                `;
+            }
+
+            proposalHtml += `</div>`;
+        }
+
+        document.getElementById('out_proposals').innerHTML = proposalHtml;
+
+        // 6. 呼叫 QR Code API
+        const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?data=${encodeURIComponent(fullVerifyCode)}&size=120x120`;
+        document.getElementById('out_qrcode').innerHTML = `<img src="${qrApiUrl}" alt="Verification QR">`;
+
+        // 7. 顯示選票區塊並捲動
+        document.getElementById('ballot-paper').style.display = 'block';
+        window.scrollTo({
+            top: document.getElementById('ballot-paper').offsetTop,
+            behavior: 'smooth'
+        });
+    }
+</script>
+
+</body>
+</html>
